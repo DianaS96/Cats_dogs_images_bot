@@ -1,7 +1,7 @@
 import telebot
 from telebot import types
-import urllib
-import json
+from get_image import get_image_of_dog
+from get_image import get_image_of_cat
 
 bot = telebot.TeleBot('5053129987:AAEx3Yunb-0qcqZaAGR1fOggyUfj3XWoLKc')
 
@@ -12,7 +12,23 @@ bot = telebot.TeleBot('5053129987:AAEx3Yunb-0qcqZaAGR1fOggyUfj3XWoLKc')
 def send_message(message):
     sticker = open('static/welcome.webp', 'rb')
     bot.send_sticker(message.chat.id, sticker)
+    bot.send_message(message.chat.id, "If you need help, type /help")
 
+# Handling /help command.
+# The function sends to user a message with explanation how to get image of animal.
+@bot.message_handler(commands=["help"])
+def help_user(message):
+    keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(types.InlineKeyboardButton("Send message to developer", url="telegram.me/Diana_s96"))
+    bot.send_message(message.chat.id,
+                     "1) Type /photo.\n" +
+                     "2) Click on the option you are interested in.\n" +
+                     "3) Enjoy picture of cute animal!", reply_markup=keyboard)
+
+# Handling /photo command.
+# The function creates menu that allows to choose image the user can get
+@bot.message_handler(commands="photo")
+def get_photo_of_cute_animal(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     item_cat = types.KeyboardButton("Get image of cat")
     item_dog = types.KeyboardButton("Get image of dog")
@@ -21,7 +37,7 @@ def send_message(message):
 
     bot.send_message(message.chat.id, "Please, choose an option from the menu", parse_mode=None, reply_markup=markup)
 
-# Sending requested image of dog/cat
+# Sending requested image of animal to user
 @bot.message_handler(content_types=['text'])
 def send_image(message):
     if message.chat.type == 'private':
@@ -33,24 +49,8 @@ def send_image(message):
             get_image_of_dog()
             photo = open("dog.jpg", 'rb')
             bot.send_photo(message.chat.id, photo)
+
         else:
-            bot.send_message(message.chat.id, "Whaaaaaaaat????")
-
-# Getting image of cat
-def get_image_of_cat():
-    url = "https://cataas.com/cat"
-    fd = open("cat.jpg", 'wb')
-    fd.write(urllib.request.urlopen(url).read())
-    fd.close()
-
-# Getting image of dog
-def get_image_of_dog():
-    with urllib.request.urlopen("https://dog.ceo/api/breeds/image/random") as url:
-        data = url.read().decode('utf-8')
-    data_json = json.loads(data)
-    url = data_json['message']
-    fd_dog = open("dog.jpg", "wb")
-    fd_dog.write((urllib.request.urlopen(url).read()))
-    fd_dog.close()
+            bot.send_message(message.chat.id, "Ooops, I don't understand you. Try again")
 
 bot.infinity_polling()
