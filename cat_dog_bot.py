@@ -3,7 +3,7 @@ from telebot import types
 from get_image import get_image_of_dog
 from get_image import get_image_of_cat
 
-bot = telebot.TeleBot('5053129987:AAEx3Yunb-0qcqZaAGR1fOggyUfj3XWoLKc')
+bot = telebot.TeleBot('5298884045:AAGzPECbhDW3hNQK7UAQkGlLjYihPqZpJZY')
 
 # @message_handler reacts on incoming messages.
 
@@ -42,14 +42,21 @@ def get_photo_of_cute_animal(message):
 def send_image(message):
     if message.chat.type == 'private':
         if message.text == "Get image of cat":
-            get_image_of_cat()
-            photo = open('cat.jpg', 'rb')
-            bot.send_photo(message.chat.id, photo)
+            try:
+                get_image_of_cat()
+                photo = open('cat.jpg', 'rb')
+                bot.send_photo(message.chat.id, photo)
+            except:
+                photo = open('static/cat_img.jpg', 'rb')
+                bot.send_photo(message.chat.id, photo)
         elif message.text == "Get image of dog":
-            get_image_of_dog()
-            photo = open("dog.jpg", 'rb')
-            bot.send_photo(message.chat.id, photo)
-
+            try:
+                get_image_of_dog()
+                photo = open("dog.jpg", 'rb')
+                bot.send_photo(message.chat.id, photo)
+            except:
+                photo = open("static/doge_mem.jpg", 'rb')
+                bot.send_photo(message.chat.id, photo)
         else:
             bot.send_message(message.chat.id, "Ooops, I don't understand you. Try again")
 
